@@ -9,8 +9,9 @@ const options = {
 };
 
 const hostname = getHostname();
+console.log(hostname);
 const keyword = "MouseShareHost"
-https.createServer(options,onRequest).listen(8888, hostname);
+https.createServer(options,onRequest).listen();
 function onRequest(request:IncomingMessage, response:ServerResponse) {
     switch(request.url){
         case "/":{
