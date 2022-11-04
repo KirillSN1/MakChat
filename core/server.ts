@@ -20,7 +20,4 @@ const server = new http.Server((request, response)=>{
         }
     }
 });
-if(Env.DEBUG){
-    server.listen(Env.localPort, Env.localhost);
-    console.log(`Local server started on http://${Env.localhost}:${Env.localPort}.`);
-}
+server.listen(Env.localPort, ()=>console.log(`Server started on port ${Env.localPort}.`));

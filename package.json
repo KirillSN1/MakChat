@@ -2,7 +2,7 @@
   "name": "matcha",
   "version": "1.0.0",
   "description": "",
-  "main": "core/server.ts",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build":"node --loader ts-node/esm --inspect ./core/server.ts",
