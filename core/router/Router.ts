@@ -1,5 +1,4 @@
 import { IncomingMessage, ServerResponse } from "http";
-import fs from "fs";
 
 export default class Router {
     private static _routes:Array<Route> = [];
@@ -10,7 +9,7 @@ export default class Router {
             else return route.path == request.url;
         });
         var result = route?route.handler(request,response):Router.onNotFound(request,response);
-        if(!response.closed){
+        if(response.writable){
             if(result){
                 response.writeHead(200);
                 response.write(result.toString());
@@ -18,7 +17,7 @@ export default class Router {
             response.end();
         }
     }
-static onNotFound:RouteHandler = (_,response)=>{ response!.writeHead(404); return "Not Found" };
+	static onNotFound:RouteHandler = (_,response)=>{ response!.writeHead(404); return "Not Found" };
     static route(method:String, path:String | RegExp, handler:RouteHandler){
         Router._routes.push(new Route(method,path, handler));
     }

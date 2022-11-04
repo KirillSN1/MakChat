@@ -1,1 +1,1 @@
-web: ts-node core/server.ts
+web: ts-node core/server.tsn

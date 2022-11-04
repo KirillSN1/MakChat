@@ -2,10 +2,12 @@
   "name": "matcha",
   "version": "1.0.0",
   "description": "",
-  "main": "core.ts",
+  "main": "./core/core.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "ts-node core/core.ts --local"
+    "prod": "cross-env NODE_ENV=production ts-node core/core.ts",
+    "dev": "cross-env NODE_ENV=development ts-node core/core.ts",
+    "watch": "nodemon --watch dev --watch ./**/*.ts "
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +17,7 @@
   "devDependencies": {
     "@tsconfig/node16": "^1.0.3",
     "@types/node": "^18.7.18",
+    "cross-env": "^7.0.3",
     "ts-node": "^10.9.1",
     "tslib": "^2.4.0"
   }
