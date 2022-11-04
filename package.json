@@ -7,8 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node .",
     "build":"tsc",
-    "prod": "cross-env NODE_ENV=production build",
-    "dev": "cross-env NODE_ENV=development build",
+    "dev": "cross-env NODE_ENV=development npm run build && npm run start",
     "watch": "nodemon --watch dev --watch ./**/*.ts "
   },
   "author": "",
