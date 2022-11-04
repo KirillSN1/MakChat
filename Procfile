@@ -1,1 +1,1 @@
-web: node core/server.ts
+web: npm run prod
