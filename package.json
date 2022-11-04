@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build":"node --loader ts-node/esm --inspect ./core/server.ts",
+    "start": "node .",
+    "build":"tsc",
     "prod": "cross-env NODE_ENV=production build",
     "dev": "cross-env NODE_ENV=development build",
     "watch": "nodemon --watch dev --watch ./**/*.ts "
