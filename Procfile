@@ -1,1 +1,1 @@
-web: npm run prod
+web: cross-env NODE_ENV=production ts-node core/core.ts
