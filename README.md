@@ -1,7 +1,7 @@
 # matcha/server
 Makeevka True Chat
 https://github.com/KirillSN1/matcha-server.git
-# Сайт: [перейти](https://makchat.herokuapp.com/){:target="_blank"}
+# Сайт: [перейти](https://makchat.herokuapp.com/)
 
 
 
