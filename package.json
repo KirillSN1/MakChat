@@ -6,19 +6,21 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node .",
-    "build":"tsc",
-    "dev": "cross-env NODE_ENV=development npm run build && npm run start",
-    "watch": "nodemon --watch dev --watch ./**/*.ts "
+    "build": "tsc",
+    "dev": "ts-node ./core/build_scripts/scripts/dev.ts --build",
+    "watch": "ts-node ./core/build_scripts/scripts/watch.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "findit": "^2.0.0",
     "typescript": "^4.8.4",
-    "ws": "^8.8.1"
+    "ws": "^8.10.0"
   },
   "devDependencies": {
     "@tsconfig/node16": "^1.0.3",
     "@types/node": "^18.7.18",
+    "@types/ws": "^8.5.3",
     "cross-env": "^7.0.3",
     "ts-node": "^10.9.1",
     "tslib": "^2.4.0"

@@ -1,6 +1,7 @@
 {
   // This is an alias to @tsconfig/node16: https://github.com/tsconfig/bases
   "extends": "@tsconfig/node16/tsconfig.json",
+  "compileOnSave": true,
   "compilerOptions": {
     "strict": true,
     "outDir": "./dist",
