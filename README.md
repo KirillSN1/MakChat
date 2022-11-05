@@ -1,7 +1,8 @@
 # matcha/server
 Makeevka True Chat
 https://github.com/KirillSN1/matcha-server.git
-# Сайт: https://makchat.herokuapp.com/
+# Сайт: [перейти](https://makchat.herokuapp.com/){:target="_blank"}
+
 
 
 # Описание core/build_scipts
