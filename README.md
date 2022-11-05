@@ -1,5 +1,8 @@
 # matcha/server
 Makeevka True Chat
+https://github.com/KirillSN1/matcha-server.git
+# Сайт: https://makchat.herokuapp.com/
+
 
 # Описание core/build_scipts
 В этой директории хранятся скрипты сборки и запуска приложения
