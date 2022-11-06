@@ -11,6 +11,7 @@ export function execScript(name:string, { onSpawn, onData, onClose }:any):ChildP
     child.stdout.on("data", onData || ((data: { toString: () => any; })=>{
         console.log(data.toString());
     }));
+    child.stderr.on("data", (error)=>console.error(error.toString()));
     return child;
 }
 export function killScript(pId:number | string, haveChildProsesses = false){

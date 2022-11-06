@@ -29,11 +29,8 @@ export default class TsBuilder{
         await this.kill();
         const { child:build, code } = await execScriptPromice("build",{ onSpawn:()=>this._eventor.emit("build") });
         this._eventor.emit("builded", build, code);
-        // console.log(`Build sucsessfull. Code: ${code}`);
         const start = execScript("start",{
-            // onSpawn:()=>console.log(`Running(${id})...`), 
             onSpawn:()=>this._eventor.emit("appRun", start),
-            // onClose:(code:number)=>console.log(`Stopped(${id}) with code ${code}`)
             onClose:(code:number)=>this._eventor.emit("appExit", start, code)
         });
         this._building = false;
