@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node .",
     "build": "tsc",
-    "dev": "ts-node ./core/build_scripts/scripts/dev.ts --build",
-    "watch": "ts-node ./core/build_scripts/scripts/watch.ts"
+    "dev": "cross-env NODE_ENV=development ts-node ./core/build_scripts/scripts/dev.ts --build",
+    "watch": "cross-env NODE_ENV=development ts-node ./core/build_scripts/scripts/watch.ts"
   },
   "author": "",
   "license": "ISC",
