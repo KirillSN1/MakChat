@@ -2,7 +2,7 @@ import http from "http";
 import Router from '../router/Router';
 import Log from '../logs/Log';
 import '../../routes/web';
-import '../../routes/web';
+import '../../routes/api';
 
 export default function run(port:number,{ debug = false }:any){
     const server = new http.Server((request, response)=>{
