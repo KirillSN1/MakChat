@@ -1,20 +1,21 @@
 import { ChildProcess, spawn } from "child_process";
 
-export function execScript(name:string, { onSpawn, onData, onClose }:any):ChildProcess{ 
-    const child = spawn(`npm`, ["run", name],{ shell:true });
-    child.on("spawn", onSpawn || (()=>{
-        console.log(`Running npm run ${name}...`);
+export function exec(name:string = "", command:string, args:Array<string>, listeners?:{ onSpawn?:(...args: any[]) => void, onData?:(...args: any[]) => void, onClose?:(...args: any[]) => void }):ChildProcess{ 
+    const child = spawn(command, args,{ shell:true });
+    const fullName = `${command} ${args.join(" ")}`;
+    child.on("spawn", listeners?.onSpawn || (()=>{
+        console.log(`Running ${name || fullName}...`);
     }));
-    child.on('close', onClose || ((code: any) => {
-        console.log(`Child process "${name}" exited with code ${code}`);
+    child.on('close', listeners?.onClose || ((code: any) => {
+        console.log(`Child process "${name || fullName}" exited with code ${code}`);
     }));
-    child.stdout.on("data", onData || ((data: { toString: () => any; })=>{
+    child.stdout.on("data", listeners?.onData || ((data: { toString: () => any; })=>{
         console.log(data.toString());
     }));
     child.stderr.on("data", (error)=>console.error(error.toString()));
     return child;
 }
-export function killScript(pId:number | string, haveChildProsesses = false){
+export function kill(pId:number | string, haveChildProsesses = false){
     var properties = ["/pid", pId.toString(), '/f', '/t'];
     if(haveChildProsesses) properties.push("/t");
     const killchild = spawn("taskkill", properties);
@@ -25,6 +26,9 @@ export function killScript(pId:number | string, haveChildProsesses = false){
     }).catch((code)=>{
         console.error(`Error: ${code}`);
     });
+}
+export function execScript(name:string, listeners?:{ onSpawn?:(...args: any[]) => void, onData?:(...args: any[]) => void, onClose?:(...args: any[]) => void }):ChildProcess{
+    return exec(name,"npm", ["run",name], listeners);
 }
 export function execScriptPromice(name: string, { onSpawn, onData }:any){
     return new Promise<{child:ChildProcess,code:Number}>((resolve)=>{

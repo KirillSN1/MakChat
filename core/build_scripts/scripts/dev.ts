@@ -1,12 +1,15 @@
-import TsBuilder from "../moduls/builder";
-
-export default function devbuild(){
-    var builder = new TsBuilder();
-    builder.on("build",()=>console.log("Building..."));
-    builder.on("builded",()=>console.log("Build sucsess!"));
-    builder.on("appRun",()=>console.log("Running app..."));
-    builder.on("appExit",(_,code)=>console.log(`App stopped with code ${code}`));
-    builder.build();
-    return builder;
-}
-if(process.argv.slice(2).includes("--build")) devbuild();
+import { TsBuilderScript } from "../moduls/builder";
+import getDefaultBuilder from "../moduls/default_builder";
+const args = process.argv.slice(2);
+const buildArg = "/build";
+const startArg = "/start";
+const buildArgIndex = args.indexOf(buildArg);
+const buildScriptName = buildArgIndex<0?"":args[buildArgIndex+1];
+const startArgIndex = args.indexOf(startArg);
+const startScriptName = startArgIndex<0?"":args[startArgIndex+1];
+const scripts = args.filter(value=>!([buildArg,startArg,buildScriptName,startScriptName].includes(value)));
+const builderScripts:Array<TsBuilderScript> = scripts.map(script=>({
+    command:"npm", args:["run",script], name:script
+}));
+const builder = getDefaultBuilder(buildScriptName,startScriptName,builderScripts);
+builder.build(buildScriptName.length>0,startScriptName.length>0);

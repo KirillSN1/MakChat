@@ -1,4 +1,13 @@
 import Env from "../env";
-import Router from "../core/router/Router";
+import ApiController from "../app/http/Controllers/ApiController";
+import Router, { JsonResponse } from "../core/router/Router";
+import AuthController from "../app/http/Controllers/AuthController";
 
-Router.route("GET", "/Api/getPort", ()=>Env.port);
+Router.get("/Api/signUp", AuthController.signUp);
+Router.get("/Api/signIn", AuthController.signIn);
+Router.get("/Api/testLogin", (request)=>new JsonResponse({
+    result:Env.loginRegExp.test(request.getString("login")) 
+}));
+Router.get("/Api/findChats", ApiController.findChats);
+Router.get("/Api/getUserChats",ApiController.getUserChats).middleware('auth');
+Router.post("/Api/createChatWithUser", ApiController.createChatWithUser).middleware('auth');

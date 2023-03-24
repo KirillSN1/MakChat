@@ -5,13 +5,13 @@
   "compilerOptions": {
     "strict": true,
     "outDir": "./dist",
-    "baseUrl": "./",
     "module": "commonjs",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "removeComments": true,
+    "experimentalDecorators": true
   },
   "include": [
     "./**/*",
-  ]
+  ],
 }
