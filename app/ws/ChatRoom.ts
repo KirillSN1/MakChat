@@ -1,9 +1,22 @@
+/**
+ * 
+ * 
+ * 
+ * 
+ * 
+ * DEPRECATED
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
 import Chat from "../db/Models/Chat";
 import ChatMessage from "../db/Models/ChatMessage";
 import WSClient from "./WsClient/WSClient";
-import { WsMessageType } from "./WsMessagesTypes";
+import { BulletType } from "./BulletType";
 import Emitter, { Event } from "../../core/Events/Emitter";
-import WsClientTextMessage from "./ws_client_messages/WsClientTextMessage";
+import WsClientTextMessage from "./punches/WsClientTextMessage";
 
 type MessageEventHandler = { (message:WsClientTextMessage, client:WSClient):void }
 type CloseEventHandler = { (client:WSClient, code:number, reson:Buffer):void };
@@ -24,7 +37,7 @@ export default class ChatRoom{
     public write(message:ChatMessage){
         this._clients.forEach((client)=>{
             const data = message.serialize();
-            const messageRaw = JSON.stringify({ type:WsMessageType.chat, ...data });
+            const messageRaw = JSON.stringify({ type:BulletType.chat, ...data });
             client.socket.send(messageRaw);
         });
     }
@@ -33,7 +46,7 @@ export default class ChatRoom{
         client.socket.addListener("message", (data)=>{
             const json = JSON.parse(data.toString());
             switch(json?.type){
-                case(WsMessageType.chat):
+                case(BulletType.chat):
                     const message = new WsClientTextMessage(json);
                     this._emitter.emit(this.messageEvent.name,message, client);
                 break;

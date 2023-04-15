@@ -1,6 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http";
 import url from "url"
 import Env from "../../env";
+import HEADERS_CONFIG from "./headers_config";
 
 export default class Router {
     private static _routes:Array<Route> = [];
@@ -12,6 +13,10 @@ export default class Router {
             if(route.path instanceof RegExp) return route.path.test(incomingUrl.pathname || "");
             else return route.path == incomingUrl.pathname;
         });
+        if(route){
+            for(const _header of Object.entries(HEADERS_CONFIG))
+                response.setHeader(_header[0],_header[1]);
+        }
         const next:RouteHandler = async (requestData: RequestData, routerResponse: RouterResponse)=>{
             try{
                 var result = await (route?route.handler(requestData,routerResponse):Router.onNotFound(requestData,routerResponse));
@@ -134,6 +139,9 @@ export class RequestData{
     }
     getString(name:string, defaultValue:string = ""):string{
         return this.params.get(name) || "" || defaultValue;
+    }
+    getArray<T>(name:string, defaultValue:Array<T> = []):Array<T>{
+        return this.getJSON(name,defaultValue);
     }
     getNumber(name:string, defaultValue:string = ""):number{
         return Number(this.getString(name,defaultValue));

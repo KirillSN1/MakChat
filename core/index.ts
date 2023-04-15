@@ -1,4 +1,4 @@
-import WebSocketRouter from "../app/ws/WSClientsHost";
+import WebSocketRouter from "../app/ws/WebSocketRouter";
 import Env from "../env";
 import run from "./app/run";
 

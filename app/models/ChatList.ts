@@ -10,8 +10,7 @@ export default class ChatList extends Serializable {
         const chatsParticipantsOfUser = await ChatParticipant.findAll({ appUser:user.id });
         const chatIds = chatsParticipantsOfUser.map(p=>p.chat);
         if(chatIds.length){
-            const cond = chatIds.length>1?`id IN ${chatIds.join(",")}`:{ id:chatIds[0] }
-            const chats = await Chat.findAll(cond);
+            const chats = await Chat.query().select("*").whereIn("id",chatIds);
             for(const participantOfUser of chatsParticipantsOfUser){
                 const chat = chats.find(c=>c.id == participantOfUser.chat);
                 if(!chat) continue;

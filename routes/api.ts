@@ -10,4 +10,4 @@ Router.get("/Api/testLogin", (request)=>new JsonResponse({
 }));
 Router.get("/Api/findChats", ApiController.findChats);
 Router.get("/Api/getUserChats",ApiController.getUserChats).middleware('auth');
-Router.post("/Api/createChatWithUser", ApiController.createChatWithUser).middleware('auth');
+Router.post("/Api/createChat", ApiController.createChat).middleware('auth');

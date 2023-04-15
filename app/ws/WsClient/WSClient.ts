@@ -2,8 +2,8 @@ import WebSocket, { RawData } from "ws";
 import Emitter, { Event } from "../../../core/Events/Emitter";
 import Auth, { AuthInfo, InvalidTokenError } from "../../auth/Auth";
 import InvalidArgumentError from "../../errors";
-import WsClientConnectMessage from "../ws_client_messages/WsClientConnectMessage";
-import WsServerConnectResponseMessage from "../ws_server_messages/WsServerConnectMessage";
+import ConnectPunch from "../punches/ConnectPunch";
+import ConnectionBullet from "../bullets/ConnectionBullet";
 import WSCloseCode from "../WSCloseCodes";
 
 type ChangeStatusHandler = { (status:WsClientStatus):void }
@@ -15,7 +15,7 @@ export default class WSClient {
     private readonly emitter = new Emitter();
     public readonly changeStatusEvent = this.emitter.createEvent<ChangeStatusHandler>("changeStatus");
     public readonly onConnected = this.emitter.createEvent<ConnectHandler>("connected");
-    private _connectMessage?: WsClientConnectMessage;
+    private _connectMessage?: ConnectPunch;
     private _pingInterval: number;
     private _pingTimer?: NodeJS.Timer;
     get status(){ return this._status }
@@ -33,7 +33,7 @@ export default class WSClient {
         const jsonRaw = data.toString();
         var authInfo:AuthInfo | null = null;
         try{
-            this._connectMessage = new WsClientConnectMessage(JSON.parse(jsonRaw));;
+            this._connectMessage = new ConnectPunch(JSON.parse(jsonRaw));;
             authInfo = await Auth.tryGetBy(this._connectMessage.token);
         } catch (e){
             if(!(e instanceof InvalidTokenError)) console.error(e);
@@ -42,7 +42,7 @@ export default class WSClient {
         else this._disconnect();
     }
     private _acceptConnection(authInfo:AuthInfo){
-        const message = WsServerConnectResponseMessage.success();
+        const message = ConnectionBullet.success(authInfo.user.id);
         this.socket.send(message.toJson());
         this.emitter.emit(this.onConnected.name,authInfo);
         this.setStatusAndNotify(WsClientStatus.CONNECTED);

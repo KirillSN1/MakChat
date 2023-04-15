@@ -51,7 +51,9 @@ export default class TsBuilder{
         if(runStart){
             const start = execScript(this._startScriftName,{
                 onSpawn:()=>this._eventor.emit("appRun", start),
-                onClose:(code:number)=>this._eventor.emit("appExit", start, code)
+                onClose:(code:number)=>this._eventor.emit("appExit", start, code),
+                onError:(error:string)=>this._eventor.emit("error", start, error),
+                onData:(data:string)=>this._eventor.emit("data", start, data),
             });
             children.push(start);
         }

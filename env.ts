@@ -14,4 +14,6 @@ export default class Env {
     static readonly PG_LOGGING = false;
     static readonly SYNC_DATABASE_ON_BUILD = true;
     static readonly postDataSizeLimit = 1e6;
+    static readonly ALLOW_ORIGIN = Env.DEBUG?"*":""//todo: set production origin
+    static readonly DEFAULT_CHATS_COUNT_LIMIT = 100;
 }

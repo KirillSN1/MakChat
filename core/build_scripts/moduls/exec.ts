@@ -1,7 +1,14 @@
 import { ChildProcess, spawn } from "child_process";
+const childProcessDebug = require("child-process-debug");
 
-export function exec(name:string = "", command:string, args:Array<string>, listeners?:{ onSpawn?:(...args: any[]) => void, onData?:(...args: any[]) => void, onClose?:(...args: any[]) => void }):ChildProcess{ 
-    const child = spawn(command, args,{ shell:true });
+type ScriptEventListeners = { 
+    onSpawn?:(...args: any[]) => void, 
+    onData?:(...args: any[]) => void, 
+    onClose?:(...args: any[]) => void,
+    onError?:(...args:any[]) => void 
+};
+export function exec(name:string = "", command:string, args:Array<string>, listeners?:ScriptEventListeners):ChildProcess{ 
+    const child = childProcessDebug.spawn(command, args,{ shell:true });
     const fullName = `${command} ${args.join(" ")}`;
     child.on("spawn", listeners?.onSpawn || (()=>{
         console.log(`Running ${name || fullName}...`);
@@ -12,7 +19,10 @@ export function exec(name:string = "", command:string, args:Array<string>, liste
     child.stdout.on("data", listeners?.onData || ((data: { toString: () => any; })=>{
         console.log(data.toString());
     }));
-    child.stderr.on("data", (error)=>console.error(error.toString()));
+    // child.stderr.on("data", (error)=>console.error(error.toString()));
+    child.stderr.on("data", listeners?.onError || ((error:any)=>{
+        console.error(error.toString());
+    }));
     return child;
 }
 export function kill(pId:number | string, haveChildProsesses = false){
@@ -27,7 +37,7 @@ export function kill(pId:number | string, haveChildProsesses = false){
         console.error(`Error: ${code}`);
     });
 }
-export function execScript(name:string, listeners?:{ onSpawn?:(...args: any[]) => void, onData?:(...args: any[]) => void, onClose?:(...args: any[]) => void }):ChildProcess{
+export function execScript(name:string, listeners?:ScriptEventListeners):ChildProcess{
     return exec(name,"npm", ["run",name], listeners);
 }
 export function execScriptPromice(name: string, { onSpawn, onData }:any){

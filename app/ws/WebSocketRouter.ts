@@ -51,7 +51,12 @@ export default class WebSocketRouter{
             if(!json?.type) return;
             const route = WebSocketRouter._routes.find((route)=>route.name == json.type);
             if(!route) return;
-            route.handler(json ,client, authInfo);
+            try{
+                route.handler(json ,client, authInfo);
+            } catch(e) {
+                console.error(`Error in ws route "${route.name}:"`);
+                console.error(e);
+            }
         })
     }
     static on(messageType:string,handler:WebSocketRouterHandler){

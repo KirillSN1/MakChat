@@ -45,4 +45,7 @@ export default class ChatParticipant extends Model{
             return instance;
         });
     }
+    static query(){
+        return this.getKnex<ChatParticipant>();
+    }
 }

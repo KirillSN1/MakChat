@@ -64,4 +64,7 @@ export default class AppUser extends Model{
         const result = await this._find(data,limit);
         return result.rows.map((raw)=>AppUser.parse(raw));
     }
+    static query(){
+        return this.getKnex<AppUser>();
+    }
 }

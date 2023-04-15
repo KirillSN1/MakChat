@@ -7,7 +7,7 @@ const buildArgIndex = args.indexOf(buildArg);
 const buildScriptName = buildArgIndex<0?"":args[buildArgIndex+1];
 const startArgIndex = args.indexOf(startArg);
 const startScriptName = startArgIndex<0?"":args[startArgIndex+1];
-const scripts = args.filter(value=>!([buildArg,startArg,buildScriptName,startScriptName].includes(value)));
+const scripts = args.filter(value=>!([buildArg,startArg,buildScriptName,startScriptName].includes(value) && value.search("--")==-1 && value.search("-")!=0));
 const builderScripts:Array<TsBuilderScript> = scripts.map(script=>({
     command:"npm", args:["run",script], name:script
 }));

@@ -5,32 +5,31 @@ import AppUser from "../../db/Models/AppUser";
 import ChatParticipant from "../../db/Models/ChatParticipant";
 import ChatList from "../../models/ChatList";
 import { AuthMiddleware } from "../Middleware/AuthMiddleware";
+import PropsRule from "../../../low/PropsRule";
+import ChatType from "../../db/Models/ChatType";
 
 export default class ApiController{
-    /**
-     * Параметры запроса:
-     *  Обязательные:
-     *      token:string - токен авторизации
-     *      id:number - id иcкомого пользователя
-     */
-    public static async createChatWithUser(request:RequestData, response: RouterResponse){
-        const id = request.getNumber("id");
-        if(!id) return response.error('Не передан обязательный параметр "id"',422);
+    public static async createChat(request:RequestData, response: RouterResponse){
+        const ids = request.getArray("userIds");
+        if(!ids) return response.error('Не передан обязательный параметр "ids"',422);
         const authInfo = AuthMiddleware.getAuthInfo();
-        var otherUser = await AppUser.find({ id });
-        if(!otherUser) return response.error("Пользователь не найден", 404, "Unknown user id");
-        const chat = await Chat.createSingle(`${authInfo.user.name || authInfo.user.login}, ${otherUser.name || otherUser.login}`);
+        const users = ids.length?await AppUser.query().select("*").where("id",ids):[];
+        const chat = await Chat.create(`${authInfo.user.name || authInfo.user.login}, (${users.map(u=>u.name || u.login).join(", ")})`);
+        if(!chat) return response.error("Неизвестная ошибка");
         await ChatParticipant.create({
             appUser: authInfo.user.id,
             chat: chat.id,
             role: 1
         });
-        await ChatParticipant.create({
-            appUser: otherUser.id,
-            chat: chat.id,
-            role: 1
-        });
-        if(!chat) return response.error("Неизвестная ошибка");
+        await Promise.all(
+            users.map((user)=>
+                ChatParticipant.create({
+                    appUser: user.id,
+                    chat: chat.id,
+                    role: 1
+                })
+            )
+        );
         return new JsonResponse(chat);
     }
     /**
@@ -39,9 +38,11 @@ export default class ApiController{
      */
     static async findChats(request:RequestData){
         const search = request.getString("search");
-        if(!search || !search.length) return new JsonResponse([]);
-        const users = await AppUser.findAll({ login:{ operator:"LIKE", value:`%${search}%` } });
-        return new JsonResponse(users.filter(u=>u != null).map(u=>u!.safeData));
+        const result = { users:[] as any[], chats:[] as any[] };
+        if(!search || !search.length) return new JsonResponse(result);
+        const foundUsers = await AppUser.findAll({ login:{ operator:"LIKE", value:`%${search}%` } });
+        result.users = foundUsers.filter(u=>u != null).map(u=>u!.safeData);
+        return new JsonResponse(result);
     }
     static async getUserChats(request:RequestData){
         const authInfo = AuthMiddleware.getAuthInfo();

@@ -1,4 +1,17 @@
-import { WsMessageType } from "../WsMessagesTypes";
+/**
+ * 
+ * 
+ * 
+ * 
+ * 
+ * DEPRECATED
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+import { BulletType } from "../BulletType";
 
 export default class WsClientTextMessage{
     public readonly id:number = 0;
