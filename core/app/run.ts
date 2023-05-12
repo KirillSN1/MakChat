@@ -9,8 +9,8 @@ import '../../routes/api';
 import '../../routes/ws';
 
 export default function run(port:number,{ debug = false }:any){
-    const privateKey = fs.readFileSync('privatekey.pem' );
-    const certificate = fs.readFileSync('certificate.pem' );
+    const privateKey = fs.existsSync('privatekey.pem')?fs.readFileSync('privatekey.pem'):"";
+    const certificate = fs.existsSync('certificate.pem')?fs.readFileSync('certificate.pem'):"";
     const options = {
         key:privateKey, cert:certificate
     }
