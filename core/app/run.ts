@@ -1,20 +1,13 @@
 import http from "http";
-import https from "https";
 import Router from '../router/Router';
 import Log from '../logs/Log';
-import fs from 'fs';
 import '../../routes/middleware';
 import '../../routes/web';
 import '../../routes/api';
 import '../../routes/ws';
 
 export default function run(port:number,{ debug = false }:any){
-    const privateKey = fs.existsSync('privatekey.pem')?fs.readFileSync('privatekey.pem'):"";
-    const certificate = fs.existsSync('certificate.pem')?fs.readFileSync('certificate.pem'):"";
-    const options = {
-        key:privateKey, cert:certificate
-    }
-    const server = https.createServer(options, (request, response)=>{
+    const server = http.createServer((request, response)=>{
         try{ Router.onRequest(request, response) } 
         catch(e:any){
             const now = new Date();
