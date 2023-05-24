@@ -31,7 +31,6 @@ export default function run(port:number,{ debug = false }:any){
             if (fs.existsSync(path)) {
                 fs.unlinkSync(path);
             }
-            else throw new Error(`Can not find unix socket file. Please create it.\nPath:${path}.\nOr edit env variable`);
             server.listen(path,()=>{
                 fs.chmod(path, '740',reject);
                 resolve(server);
