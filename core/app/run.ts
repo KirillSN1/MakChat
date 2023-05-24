@@ -25,11 +25,10 @@ export default function run(port:number,{ debug = false }:any){
         if(Env.DEBUG) server.listen(port, ()=>resolve(server));
         else{
             //Unix сокет нужен для связи с сервером nginx
-            if(!Env.UNIX_SOCKET) throw new Error(`Env variable "UNIX_SOCKET" is not specified. (File path)`);
-            if(!fs.existsSync(Env.UNIX_SOCKET)){
-                fs.writeFileSync(Env.UNIX_SOCKET,"");//создание файла сокета
-                fs.chmodSync(Env.UNIX_SOCKET, 740);//ограничение прав
-            }
+            if(!Env.UNIX_SOCKET) 
+                throw new Error(`Env variable "UNIX_SOCKET" is not specified. (File path)`);
+            if(!fs.existsSync(Env.UNIX_SOCKET)) 
+                throw new Error(`Can not find unix socket file. Please create it.\nPath:${Env.UNIX_SOCKET}.\nOr edit env variable`);
             server.listen(Env.UNIX_SOCKET,()=>resolve(server))
             console.log(`Server is listening on ${Env.UNIX_SOCKET}`);
         }
