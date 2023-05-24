@@ -21,16 +21,22 @@ export default function run(port:number,{ debug = false }:any){
             }
         }
     })
-    return new Promise<http.Server>((resolve)=>{
+    return new Promise<http.Server>((resolve,reject)=>{
         if(Env.DEBUG) server.listen(port, ()=>resolve(server));
         else{
             //Unix сокет нужен для связи с сервером nginx
-            if(!Env.UNIX_SOCKET) 
+            const path = Env.UNIX_SOCKET;
+            if(!path) 
                 throw new Error(`Env variable "UNIX_SOCKET" is not specified. (File path)`);
-            if(!fs.existsSync(Env.UNIX_SOCKET)) 
-                throw new Error(`Can not find unix socket file. Please create it.\nPath:${Env.UNIX_SOCKET}.\nOr edit env variable`);
-            server.listen(Env.UNIX_SOCKET,()=>resolve(server))
-            console.log(`Server is listening on ${Env.UNIX_SOCKET}`);
+            if (fs.existsSync(path)) {
+                fs.unlinkSync(path);
+            }
+            else throw new Error(`Can not find unix socket file. Please create it.\nPath:${path}.\nOr edit env variable`);
+            server.listen(path,()=>{
+                fs.chmod(path, '740',reject);
+                resolve(server);
+            });
+            console.log(`Server is listening on ${path}`);
         }
     });
 }
