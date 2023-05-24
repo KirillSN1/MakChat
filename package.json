@@ -8,6 +8,8 @@
     "start": "ts-node ./core/index.ts",
     "dev": "cross-env NODE_ENV=development ts-node ./core/build_scripts/scripts/dev.ts --debug /start start lt-start ",
     "watch": "cross-env NODE_ENV=development ts-node ./core/build_scripts/scripts/watch.ts--debug /start start lt-start ",
+    "production":"cross-env NODE_ENV=production npm run start",
+    "prod":"npm run production",
     "lt-start": "cross-env NODE_ENV=development ts-node ./core/build_scripts/scripts/lt-start.ts"
   },
   "author": "",
