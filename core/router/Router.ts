@@ -130,9 +130,9 @@ export class RequestData{
             });
             incomingMessage.on("data",(data)=>{
                 body+=data;
-                if (body.length > Env.postDataSizeLimit){
+                if (body.length > Env.POST_DATA_SIZE_LIMIT){
                     incomingMessage.destroy();
-                    reject(`Content to large. Limit:${Env.postDataSizeLimit}`);
+                    reject(`Content to large. Limit:${Env.POST_DATA_SIZE_LIMIT}`);
                 }
             });
         })

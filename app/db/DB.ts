@@ -8,7 +8,7 @@ export default class DB{
     static connect(){
         if(DB.client) return DB.client;
         DB.client = new Client({
-            host:Env.HOST,
+            host:Env.PGHOST,
             database:Env.PGDATABASE,
             password:Env.PGPASSWORD,
             port:Env.PGPORT,
@@ -24,7 +24,7 @@ export default class DB{
             dialect:"",
             client: 'pg',
             connection: {
-                host : Env.HOST,
+                host : Env.PGHOST,
                 port : Env.PGPORT,
                 user : Env.PGUSER,
                 password : Env.PGPASSWORD,

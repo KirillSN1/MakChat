@@ -5,6 +5,8 @@ import '../../routes/middleware';
 import '../../routes/web';
 import '../../routes/api';
 import '../../routes/ws';
+import Env from "../../env";
+import fs from "fs";
 
 export default function run(port:number,{ debug = false }:any){
     const server = http.createServer((request, response)=>{
@@ -19,5 +21,17 @@ export default function run(port:number,{ debug = false }:any){
             }
         }
     })
-    return new Promise<http.Server>((resolve)=>server.listen(port, ()=>resolve(server)));
+    return new Promise<http.Server>((resolve)=>{
+        if(Env.DEBUG) server.listen(port, ()=>resolve(server));
+        else{
+            //Unix сокет нужен для связи с сервером nginx
+            if(!Env.UNIX_SOCKET) throw new Error(`Env variable "UNIX_SOCKET" is not specified. (File path)`);
+            if(!fs.existsSync(Env.UNIX_SOCKET)){
+                fs.writeFileSync(Env.UNIX_SOCKET,"");//создание файла сокета
+                fs.chmodSync(Env.UNIX_SOCKET, 740);//ограничение прав
+            }
+            server.listen(Env.UNIX_SOCKET,()=>resolve(server))
+            console.log(`Server is listening on ${Env.UNIX_SOCKET}`);
+        }
+    });
 }

@@ -5,11 +5,9 @@
   "main": "dist/core/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node .",
-    "ts-start": "ts-node ./core/index.ts",
-    "build": "tsc",
-    "dev": "cross-env NODE_ENV=development ts-node ./core/build_scripts/scripts/dev.ts --debug /start ts-start lt-start ",
-    "watch": "cross-env NODE_ENV=development ts-node ./core/build_scripts/scripts/watch.ts--debug /start ts-start lt-start ",
+    "start": "ts-node ./core/index.ts",
+    "dev": "cross-env NODE_ENV=development ts-node ./core/build_scripts/scripts/dev.ts --debug /start start lt-start ",
+    "watch": "cross-env NODE_ENV=development ts-node ./core/build_scripts/scripts/watch.ts--debug /start start lt-start ",
     "lt-start": "cross-env NODE_ENV=development ts-node ./core/build_scripts/scripts/lt-start.ts"
   },
   "author": "",
@@ -18,6 +16,7 @@
     "argon2": "^0.30.2",
     "child-process-debug": "^0.0.7",
     "colors": "^1.4.0",
+    "dotenv": "^16.0.3",
     "findit": "^2.0.0",
     "jsonwebtoken": "^8.5.1",
     "knex": "^2.4.0",
@@ -26,6 +25,7 @@
     "pg": "^8.8.0",
     "pg-hstore": "^2.3.4",
     "ts-serializer": "^2.2.6",
+    "tsconfig-paths": "^4.2.0",
     "ws": "^8.10.0"
   },
   "devDependencies": {
