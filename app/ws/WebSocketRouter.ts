@@ -16,10 +16,10 @@ export default class WebSocketRouter{
     public static getClient(authInfo:AuthInfo):WSClient | undefined;
     public static getClient(searchData:number|String|AuthInfo):WSClient | undefined{
         if(!this.singleton) throw new Error(`You have to call init before.`);
-        return this.singleton.clients.find((client)=>client.userInfo != null &&
-            (client.userInfo == searchData ||
-            client.userInfo.token == searchData ||
-            client.userInfo.user.id == searchData)
+        return this.singleton.clients.find((client)=>client.authInfo != null &&
+            (client.authInfo == searchData ||
+            client.authInfo.token == searchData ||
+            client.authInfo.user.id == searchData)
         );
     }
     private constructor(server:Server){
@@ -36,7 +36,8 @@ export default class WebSocketRouter{
         client.changeStatusEvent.on((status)=>{
             console.log(`wss client[${index}]: ${WsClientStatus[status]}`);
             switch(status){
-                case(WsClientStatus.REFUSED_BY_SERVER):
+                case(WsClientStatus.REJECTED_BY_SERVER):
+                case(WsClientStatus.REJECTED_BY_CLIENT):
                 case(WsClientStatus.DISPOSED):
                     this._clients.splice(index, 1);
                     break;
@@ -52,7 +53,7 @@ export default class WebSocketRouter{
             const route = WebSocketRouter._routes.find((route)=>route.name == json.type);
             if(!route) return;
             try{
-                route.handler(json ,client, authInfo);
+                route.handler(json, authInfo);
             } catch(e) {
                 console.error(`Error in ws route "${route.name}:"`);
                 console.error(e);
@@ -79,7 +80,7 @@ export default class WebSocketRouter{
     //     return room;
     // }
 }
-type WebSocketRouterHandler = { (json:any, client:WSClient,authInfo:AuthInfo):void }
+type WebSocketRouterHandler = { (json:any,authInfo:AuthInfo):void }
 
 class WSRoute{
     name:string;

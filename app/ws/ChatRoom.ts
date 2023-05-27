@@ -53,7 +53,7 @@ export default class ChatRoom{
             }
         });
         client.socket.addListener("close",(code, reson)=>{
-            const userId = client.userInfo?.user.id;
+            const userId = client.authInfo?.user.id;
             client.dispose();
             this._clients.splice(this._clients.indexOf(client),1);
             this._emitter.emit(this.closeEvent.name, client, code, reson);
@@ -61,7 +61,7 @@ export default class ChatRoom{
             console.log(`[CHAT #${this.chatId}] User #${userId} exit with code ${code}.\n Reson: ${reson.toString()}.`);
         });
         client.socket.addListener("error", (err)=>{
-            console.error(`[CHAT #${this.chatId}][USER #${client.userInfo?.user.id}] Error:`);
+            console.error(`[CHAT #${this.chatId}][USER #${client.authInfo?.user.id}] Error:`);
             console.error(err);
         })
     }

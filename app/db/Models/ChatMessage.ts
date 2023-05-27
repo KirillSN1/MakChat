@@ -33,6 +33,7 @@ export default class ChatMessage extends Model{
         const toSqlParam = (param:[string,DBType<any>],i:number)=>`"${param[0]}" ${DBTypeSerialiser.operator(param[1])} $${i+1} `;
         const sql = `SELECT * FROM "${this.tablename || this.name}" WHERE` + params.map(toSqlParam).join(" AND ");
         const result = await client.query(sql,params.map(e=>e[1]));
+        if(!result.rows[0]) return undefined;
         const instance = new ChatMessage();
         instance.deserialize(result.rows[0]);
         return instance;

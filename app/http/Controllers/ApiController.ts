@@ -10,10 +10,10 @@ import ChatType from "../../db/Models/ChatType";
 
 export default class ApiController{
     public static async createChat(request:RequestData, response: RouterResponse){
-        const ids = request.getArray("userIds");
+        const ids = request.getArray("userIds")?.map(id=>Number(id));
         if(!ids) return response.error('Не передан обязательный параметр "ids"',422);
         const authInfo = AuthMiddleware.getAuthInfo();
-        const users = ids.length?await AppUser.query().select("*").where("id",ids):[];
+        const users = ids.length?await AppUser.query().select("*").whereIn("id",ids):[];
         const chat = await Chat.create(`${authInfo.user.name || authInfo.user.login}, (${users.map(u=>u.name || u.login).join(", ")})`);
         if(!chat) return response.error("Неизвестная ошибка");
         await ChatParticipant.create({
