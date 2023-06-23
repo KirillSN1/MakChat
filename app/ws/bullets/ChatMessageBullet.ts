@@ -7,6 +7,7 @@ export abstract class ChatMessageBulletData{
     abstract userId:number;
     abstract status:number; 
     abstract text:string;
+    abstract chatId:number;
     abstract created_at:number;
     abstract updated_at:number;
 }

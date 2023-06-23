@@ -44,6 +44,7 @@ export default class MessagesController{
         if(client)
         client.socket.send(new ChatMessageBullet({ 
             id:message.id,
+            chatId:from.chat,
             userId:from.appUser,
             status:message.status, 
             text:message.text,
