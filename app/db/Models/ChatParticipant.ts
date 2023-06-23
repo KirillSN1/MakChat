@@ -37,7 +37,7 @@ export default class ChatParticipant extends Model{
         return instance;
     }
     static async findAll(data:SelectData, limit?: number, order?: { column: string, dir: string }){
-        let builder = this.getKnex<ChatParticipant>().select("*").where(data).limit(limit??Infinity);
+        let builder = ChatParticipant.query.select("*").where(data).limit(limit??Infinity);
         if(order?.column) builder = builder.orderBy(`${order?.column} ${order?.dir??""}`);
         return (await builder).map((row)=>{
             const instance = new ChatParticipant();
@@ -45,7 +45,15 @@ export default class ChatParticipant extends Model{
             return instance;
         });
     }
-    static query(){
+    /**
+     * @param chatId A chat whose participants need to be found
+     * @param userId The user for whom it is necessary to find the participants of the specified chat
+     * @returns Participans of chat(chatId) for user(userId)
+     */
+    static for(chatId:Number,userId:Number){
+        return ChatParticipant.query.where("chat",chatId).where("appUser","<>",userId);
+    }
+    static get query() {
         return this.getKnex<ChatParticipant>();
     }
 }

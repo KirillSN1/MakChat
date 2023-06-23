@@ -4,6 +4,7 @@ import ChatListItem from "./ChatListItem";
 import Chat from "../db/Models/Chat";
 import ChatParticipant from "../db/Models/ChatParticipant";
 import ChatMessage from "../db/Models/ChatMessage";
+import ChatType from "../db/Models/ChatType";
 
 export default class ChatList extends Serializable {
     static async *generateForUser(user:AppUser){
@@ -15,11 +16,11 @@ export default class ChatList extends Serializable {
                 const chat = chats.find(c=>c.id == participantOfUser.chat);
                 if(!chat) continue;
                 var chatName = chat.name;
-                // if(chat.participantId){//если participantId не нулевой, значит чат личный и необходимо найти запись собеседника.
-                //     const participantId = chat.participantId==user.id?chat.ownerId:chat.participantId;
-                //     const participant = await ChatParticipant.find({ id:participantId });
-                //     chatName = (await AppUser.find({id:participant!.appUser}))!.name;
-                // }
+                if(chat.type == ChatType.uwu.id){
+                    const otherParticipant = await ChatParticipant.for(chat.id,user.id).select("appUser").first();
+                    const otherUser = await AppUser.find({ id:otherParticipant?.appUser });
+                    chatName = otherUser?.name || otherUser?.login || chatName;
+                }
                 const messagesCount = await ChatMessage.count({ 
                     participantId:participantOfUser.id,
                     id:{ operator:">", value:participantOfUser.lastReadedMessageId }
