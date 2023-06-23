@@ -44,7 +44,9 @@ export default class AuthController{
             return new JsonResponse({ ...authInfo.user.safeData, token:authInfo.token });
         } catch(e){
             if(e instanceof InvalidTokenError) return response.error("Неверный токен", 401, "Incorrect token");
-            if(e instanceof TokenExpiredError) return response.error("Токен просрочен", 401, "Token expired");
+            else if(e instanceof TokenExpiredError) return response.error("Токен просрочен", 401, "Token expired");
+            else if(e instanceof Error) return response.error(e.message, 401, e.name);
+            else return response.error("Неизвестная ошибка", 401);
         }
     }
 }
