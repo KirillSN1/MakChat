@@ -1,24 +1,29 @@
+import { AuthInfo } from "../../auth/Auth";
 import AppUser from "../../db/Models/AppUser";
 import Chat from "../../db/Models/Chat";
-import ChatMessage from "../../db/Models/ChatMessage";
+import ChatParticipant from "../../db/Models/ChatParticipant";
+import InvalidArgumentError from "../../errors";
 
 export default class ChatController{
-    // static async createOrEditMessage(chatId:Number,user:AppUser,message:{ id?:number, text:string, dateTime:number }){
-    //     const messageId = message.id??0;
-        
-    //     const exists = messageId>0 && await ChatMessage.knex.select("*").where("id",messageId);
-    //     var chatMessage:ChatMessage;
-    //     if(exists) {
-    //         await ChatMessage.edit(messageId,message.text, message.dateTime);
-    //         chatMessage = await ChatMessage.find({ id:message.id });
-    //     }
-    //     else chatMessage = await ChatMessage.create(chatId,user.id,message.text,message.dateTime);
-    //     return chatMessage;
-    // }
- 
-    static async getChats(user:AppUser){
-        var chats = await Chat.findAll({ ownerId:user.id});
-        chats.push(...(await Chat.findAll({participantId:user.id})));
-        return chats;
+    public static async createChat(ids:number[], authInfo:AuthInfo){
+        if(!ids) throw new InvalidArgumentError('Не передан обязательный параметр "ids"');
+        const users = ids.length?await AppUser.query().select("*").whereIn("id",ids):[];
+        const chat = await Chat.create(`${authInfo.user.name || authInfo.user.login}, (${users.map(u=>u.name || u.login).join(", ")})`);
+        if(!chat) throw new Error("Неизвестная ошибка");
+        await ChatParticipant.create({
+            appUser: authInfo.user.id,
+            chat: chat.id,
+            role: 1
+        });
+        await Promise.all(
+            users.map((user)=>
+                ChatParticipant.create({
+                    appUser: user.id,
+                    chat: chat.id,
+                    role: 1
+                })
+            )
+        );
+        return chat;
     }
 }

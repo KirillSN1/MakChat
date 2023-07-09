@@ -8,6 +8,7 @@ Router.get("/Api/signIn", AuthController.signIn);
 Router.get("/Api/testLogin", (request)=>new JsonResponse({
     result:Env.loginRegExp.test(request.getString("login")) 
 }));
-Router.get("/Api/findChats", ApiController.findChats);
+Router.get("/Api/findChats", ApiController.findChats).middleware('auth');
 Router.get("/Api/getUserChats",ApiController.getUserChats).middleware('auth');
 Router.post("/Api/createChat", ApiController.createChat).middleware('auth');
+Router.post("/Api/getMessagesHystory", ApiController.getMessagesHystory).middleware('auth');

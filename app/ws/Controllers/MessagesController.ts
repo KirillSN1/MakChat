@@ -5,7 +5,7 @@ import ChatParticipant from "../../db/Models/ChatParticipant";
 import ChatController from "../../http/Controllers/ChatController";
 import WebSocketRouter from "../WebSocketRouter";
 import WSClient from "../WsClient/WSClient";
-import ChatMessageBullet from "../bullets/ChatMessageBullet";
+import ChatMessageBullet, { ChatMessageBulletData } from "../bullets/ChatMessageBullet";
 import WsClientTextMessage from "../punches/WsClientTextMessage";
 
 export default class MessagesController{
@@ -42,14 +42,6 @@ export default class MessagesController{
     static sendMessage(from:ChatParticipant, to:ChatParticipant, message:ChatMessage){
         const client = WebSocketRouter.getClient(to.appUser);
         if(client)
-        client.socket.send(new ChatMessageBullet({ 
-            id:message.id,
-            chatId:from.chat,
-            userId:from.appUser,
-            status:message.status, 
-            text:message.text,
-            created_at:message.created_at,
-            updated_at:message.updated_at
-        }).toJson());
+            client.socket.send(new ChatMessageBullet(ChatMessageBulletData.from(message,from)).toJson());
     }
 }

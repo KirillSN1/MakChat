@@ -1,8 +1,7 @@
 import DB from "../DB";
 import { DBType, DBTypeParser as DBTypeSerialiser } from "../DBType";
 import Model from "../Model";
-import { Serializable, Serialize, SerializeProperty } from "ts-serializer";
-import AppUser from "./AppUser";
+import { Serialize, SerializeProperty } from "ts-serializer";
 
 type SelectData = {
     id?:DBType<number>,
@@ -38,13 +37,6 @@ export default class ChatMessage extends Model{
         instance.deserialize(result.rows[0]);
         return instance;
     }
-    // static async findByChat(chatId:number){
-    //     const chatIdSql = `SELECT chat FROM "ChatParticipant" WHERE id="ChatMessage"."participantId"`;
-    //     const sql = `SELECT * FROM "${this.tablename || this.name}"
-    //     WHERE ${Object.entries(data).map(param=>`"${param[0]}"${DBTypeParser.get(param[1])}`).join(" AND ")}
-    //     ${order?`ORDER BY ${order.column} ${order.dir}`:''}`;
-    //     const result = await client.query(sql+(limit?` LIMIT ${limit}`:""));
-    // }
     static async findLast(data:SelectData){
         // this.knex<ChatMessage>().where
         const row = await this.getKnex<ChatMessage>().select('*').where(data);
@@ -59,5 +51,8 @@ export default class ChatMessage extends Model{
     }
     static count(data: SelectData, limit?: number | undefined, order?: { column: string; dir: string; } | undefined): Promise<number> {
         return super.count(data,limit,order);
+    }
+    static query(){
+        return this.getKnex<ChatMessage>();
     }
 }

@@ -34,7 +34,8 @@ export default class WebSocketRouter{
         const index = this._clients.push(client) - 1;
         client.onConnected.on((authInfo)=>this.onUserAttached(client,authInfo));
         client.changeStatusEvent.on((status)=>{
-            console.log(`wss client[${index}]: ${WsClientStatus[status]}`);
+            console.log(`wss client[${index}](${client.authInfo?.user.id}): ${WsClientStatus[status]}`);
+            console.log(`wss clients:${JSON.stringify(this._clients.map(c=>({ userId:c.authInfo?.user.id, status:c.status })))}`);
             switch(status){
                 case(WsClientStatus.REJECTED_BY_SERVER):
                 case(WsClientStatus.REJECTED_BY_CLIENT):
@@ -45,8 +46,6 @@ export default class WebSocketRouter{
         });
     }
     private async onUserAttached(client: WSClient, authInfo:AuthInfo) {
-        // const chats = await ChatList.forUser(authInfo.user);
-        // client.socket.send(new WSChatListMessage(...chats).toJson());
         client.socket.addEventListener('message',(event:MessageEvent)=>{
             const json = JSON.parse(event.data.toString());
             if(!json?.type) return;
@@ -63,22 +62,6 @@ export default class WebSocketRouter{
     static on(messageType:string,handler:WebSocketRouterHandler){
         WebSocketRouter._routes.push(new WSRoute(messageType,handler))
     }
-    // private _addRoom(chat:Chat){
-    //     const room = new ChatRoom(chat.id);
-    //     room.messageEvent.on(async (message,client)=>{
-    //         const user = client.userInfo!.user;
-    //         const chatMessage = await ChatController.createOrEditMessage(chat, user, message);
-    //         room.write(chatMessage);
-    //     });
-    //     room.closeEvent.on(()=>{
-    //         if(room.clients.length==0) {
-    //             this._rooms.delete(room.chatId);
-    //             room.dispose();
-    //         }
-    //     });
-    //     this._rooms.set(room.chatId,room);
-    //     return room;
-    // }
 }
 type WebSocketRouterHandler = { (json:any,authInfo:AuthInfo):void }
 

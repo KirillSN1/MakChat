@@ -8,6 +8,7 @@ import { DBType } from "../DBType";
 import { Knex } from "knex";
 import ChatParticipant from "./ChatParticipant";
 import Env from "../../../env";
+import { UserJwt } from "../../auth/Auth";
 
 type SelectData = { 
     id?: DBType<number>,
@@ -26,7 +27,6 @@ export default class Chat extends Model{
     public readonly type:number;
     constructor(data:any){
         super();
-        console.log(data);
         const required = ['id','name','type'];
         for(const key of required) 
             if(!data[key]) throw new InvalidArgumentError("data");
@@ -34,16 +34,16 @@ export default class Chat extends Model{
         this.name = data.name;
         this.type = data.type;
     }
-    static async createSingle(name:string){//TODO:убрать name, определять имя пользователя
+    static async createSingle(name:string){
         const client = DB.connect();
         const chatType = (await ChatType.uwu).id;
         const sql = `INSERT INTO "Chat" ("name", "type") VALUES ($1, $2) RETURNING "id";`;
         const result = await client.query(sql,[name,chatType]);
         return this.find({ id:result.rows[0].id });
     }
-    static async create(name:string) {
+    static async create(name:string) {//TODO:Chat type param
         const chatType = (await ChatType.uwu).id;
-        return (await this.getKnex<Chat>().insert({ type:chatType, name },"*"))[0];
+        return new Chat((await this.getKnex<Chat>().insert({ type:chatType, name },"*"))[0]);
     }
     static async find(data:SelectData){
         return new Chat((await this.getKnex<Chat>().select('*').where(data))[0]);
@@ -53,6 +53,38 @@ export default class Chat extends Model{
         if(data) builder = builder.where(data);
         return await builder;
         // return (await super.findAll(data,limit)).map(chatData=>new Chat(chatData));
+    }
+    /**
+     * Преобразут переданный объект в экземпляр класса Chat, затем
+     * возвращает копию текущего объекта чата с учетом переданного пользователя:
+     * 
+     * Меняет название чата в соответствие с типом чата и участником чата.
+     * 
+     * *Присутствует обращение к БД
+     * 
+     */
+    static for(data:any, user?:AppUser){
+        return new Chat(data).for(user);
+    }
+    /** 
+     * Возвращает копию текущего объекта чата с учетом переданного пользователя:
+     * 
+     * Меняет название чата в соответствие с типом чата и участником чата.
+     * 
+     * *Присутствует обращение к БД
+     */
+    async for(user?:AppUser){
+        var name = this.name;
+        if(user)
+            switch(this.type){
+                case(ChatType.uwu.id):
+                    const otherParticipant = await ChatParticipant.of(this.id).where("appUser","<>",user.id).select("appUser").first();
+                    const otherUser = await AppUser.find({ id:otherParticipant?.appUser });
+                    name = otherUser?.name || otherUser?.login || name;
+                    break;
+                default:break;
+            }
+        return new Chat({ id:this.id, name, type:this.type });
     }
     static query(){
         return this.getKnex<Chat>();

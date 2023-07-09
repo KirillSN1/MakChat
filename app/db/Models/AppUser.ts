@@ -2,6 +2,7 @@ import { UserJwt } from "../../auth/Auth";
 import DB from "../DB";
 import { DBType, DBTypeParser } from "../DBType";
 import Model from "../Model";
+import ChatParticipant from "./ChatParticipant";
 import { AlreadyExistsError } from "./ModelsError";
 
 class InvalidDataError extends Error{}
@@ -44,25 +45,22 @@ export default class AppUser extends Model{
         if(await this.find({ login })) throw new AlreadyExistsError("User with this login already exists!");
         await client.query(`INSERT INTO "AppUser" ("login","password") VALUES ('${login}', '${password}');`);
         return this.find({ login, password });
-        // this.getKnex.select().then((dd)=>dd[0].)
     }
-    private static _find(data:FindData, limit?:number){
-        const client = DB.connect();
-        var sql = `SELECT * FROM "AppUser" WHERE `;
-        sql += Object.entries(data).map(param=>`"${param[0]}" ${DBTypeParser.get(param[1])}`).join(" AND ");
-        if(limit != null && limit>0) sql += ` LIMIT ${limit}`;
-        return client.query(sql).catch((e)=>{
-            console.error(`error in sql: ${sql}`);
-            throw e;
-        });
+    static async find(where:FindData){
+        const result = await AppUser.query().select('*').where(where).first();
+        if(result) return new AppUser(result);
+        return null;
     }
-    static async find(data:FindData){
-        const result = await this._find(data, 1);
-        return AppUser.parse(result.rows[0]);
+    static async findAll(where:FindData, limit?:number){
+        const result = await AppUser.query().select('*').where(where).limit(limit || Number.MAX_SAFE_INTEGER);
+        return result.map((raw)=>new AppUser(raw));
     }
-    static async findAll(data:FindData, limit?:number){
-        const result = await this._find(data,limit);
-        return result.rows.map((raw)=>AppUser.parse(raw));
+    /** Ищет пользователей, у которых нет личного чата с пользователем */
+    static findFreeUsers(userId:Number){
+        return AppUser.query().select()
+            .where("id","NOT IN", ChatParticipant.query.select().distinct("appUser").join("Chat","Chat.id","chat").where("Chat.type",1)
+                .whereIn("chat", ChatParticipant.query.select().distinct("chat").where("appUser",userId))
+            );
     }
     static query(){
         return this.getKnex<AppUser>();

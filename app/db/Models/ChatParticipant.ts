@@ -46,12 +46,14 @@ export default class ChatParticipant extends Model{
         });
     }
     /**
-     * @param chatId A chat whose participants need to be found
-     * @param userId The user for whom it is necessary to find the participants of the specified chat
-     * @returns Participans of chat(chatId) for user(userId)
+     * Находит и возвращает пользователя чата
      */
     static for(chatId:Number,userId:Number){
-        return ChatParticipant.query.where("chat",chatId).where("appUser","<>",userId);
+        return ChatParticipant.query.where("chat",chatId).where("appUser","=",userId).first();
+    }
+    /** Находит пользователей чата */
+    static of(chatId:Number){
+        return ChatParticipant.query.where("chat",chatId).select();
     }
     static get query() {
         return this.getKnex<ChatParticipant>();

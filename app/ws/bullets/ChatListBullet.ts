@@ -3,13 +3,23 @@ import Bullet from "../Bullet";
 import { BulletType } from "../BulletType";
 import ChatListItem from "../../models/ChatListItem";
 
+export enum ChatListEventType { add='add', remove='remove', update='update' }
+
 @Serialize({})
-export default class ChatListBullet extends Bullet<ChatListItem[]>{
+abstract class ChatListBulletData {
+    @SerializeProperty()
+    abstract chats:ChatListItem[];
+    @SerializeProperty()
+    abstract type:ChatListEventType;
+}
+
+@Serialize({})
+export default class ChatListBullet extends Bullet<ChatListBulletData>{
     @SerializeProperty()
     readonly type = BulletType.chatList;
     @SerializeProperty()
-    readonly data:ChatListItem[];
-    constructor(...data:ChatListItem[]){
+    readonly data:ChatListBulletData;
+    constructor(data:ChatListBulletData){
         super();
         this.data = data;
     }
