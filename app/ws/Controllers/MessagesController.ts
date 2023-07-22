@@ -17,6 +17,7 @@ export default class MessagesController{
         const messageData = PropsRule.get(data, 
         { 
             id:Number,
+            tempId:{ required:true, type:Number },
             chatId:{ required:true, type:Number },
             text:{ required:true, type:String },
             dateTime:{ type:Number, required:true }
@@ -24,11 +25,11 @@ export default class MessagesController{
         const author = await ChatParticipant.find({ appUser:userId, chat:messageData.chatId });
         if(!author) throw new Error("author must not be null");
         const message = await MessagesController.handleMessage({ ...messageData, from:author });
-        MessagesController.sendMessage(author, author,message);
+        MessagesController.sendMessage(author, author,message, messageData.tempId);
         const participants = await ChatParticipant.findAll({ chat:messageData.chatId });
         for(const participant of participants){
             if(author.id == participant.id) continue;
-            MessagesController.sendMessage(author, participant,message);
+            MessagesController.sendMessage(author, participant, message, messageData.tempId);
         }
     }
     static async handleMessage(data:{ id?:number,from:ChatParticipant,chatId:number,text:string,dateTime:number }){
@@ -39,9 +40,11 @@ export default class MessagesController{
         if(edited) await ChatMessage.knex.update({ text:text.trim(), updated_at:Date.now() })//TODO:edited flag
         return message;
     }
-    static sendMessage(from:ChatParticipant, to:ChatParticipant, message:ChatMessage){
+    static sendMessage(from:ChatParticipant, to:ChatParticipant, message:ChatMessage, tempId:number){
         const client = WebSocketRouter.getClient(to.appUser);
-        if(client)
-            client.socket.send(new ChatMessageBullet(ChatMessageBulletData.from(message,from)).toJson());
+        if(!client) return;
+        const bulletData = ChatMessageBulletData.from(message,from);
+        bulletData.tempId = tempId;
+        client.socket.send(new ChatMessageBullet(bulletData).toJson());
     }
 }

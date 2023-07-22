@@ -7,6 +7,7 @@ import ChatParticipant from "../../db/Models/ChatParticipant";
 
 export abstract class ChatMessageBulletData{
     abstract id:number;
+    abstract tempId:number;
     abstract userId:number;
     abstract status:number; 
     abstract text:string;
@@ -18,6 +19,7 @@ export abstract class ChatMessageBulletData{
     static from(message:any, participant?:ChatParticipant):ChatMessageBulletData{
         return { 
             id:message.id,
+            tempId:-1,
             chatId:participant?.chat || message.chatId,
             userId:participant?.appUser || message.appUser,
             status:message.status, 
