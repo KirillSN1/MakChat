@@ -79,7 +79,7 @@ export default class Chat extends Model{
             switch(this.type){
                 case(ChatType.uwu.id):
                     const otherParticipant = await ChatParticipant.of(this.id).where("appUser","<>",user.id).select("appUser").first();
-                    const otherUser = await AppUser.find({ id:otherParticipant?.appUser });
+                    const otherUser = otherParticipant?.appUser?await AppUser.find({ id:otherParticipant.appUser }): undefined;
                     name = otherUser?.name || otherUser?.login || name;
                     break;
                 default:break;
